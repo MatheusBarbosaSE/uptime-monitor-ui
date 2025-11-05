@@ -1,16 +1,13 @@
 import { useState } from 'react';
-
-
-interface LoginForm {
-  username: string;
-  password: string;
-}
+import { type LoginRequest } from '../types/auth.types';
+import { loginApi } from '../services/apiService';
 
 const Login = () => {
-  const [formData, setFormData] = useState<LoginForm>({
+  const [formData, setFormData] = useState<LoginRequest>({
     username: '',
     password: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -20,15 +17,28 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form data to submit:', formData);
+    setError(null);
+
+    try {
+      const response = await loginApi(formData);
+
+      console.log('Login successful! Token:', response.data.token);
+      alert('Login successful! Check the console for your token.');
+
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Login failed. Please check your username and password.');
+    }
   };
 
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
         <div>
           <label htmlFor="username">Username:</label>
           <input
