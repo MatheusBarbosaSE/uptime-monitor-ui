@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { type LoginRequest } from '../types/auth.types';
 import { loginApi } from '../services/apiService';
 
-const Login = () => {
+interface LoginProps {
+  onLoginSuccess: (token: string) => void;
+}
+
+const Login = ({ onLoginSuccess }: LoginProps) => {
   const [formData, setFormData] = useState<LoginRequest>({
     username: '',
     password: '',
@@ -24,8 +28,7 @@ const Login = () => {
     try {
       const response = await loginApi(formData);
 
-      console.log('Login successful! Token:', response.data.token);
-      alert('Login successful! Check the console for your token.');
+      onLoginSuccess(response.data.token);
 
     } catch (err) {
       console.error('Login failed:', err);
