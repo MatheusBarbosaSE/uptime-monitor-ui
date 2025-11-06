@@ -5,3 +5,9 @@ export interface Target {
   createdAt: string;
   checkInterval: number;
 }
+
+export interface CreateTargetRequest {
+  name: string;
+  url: string;
+  checkInterval: number;
+}
