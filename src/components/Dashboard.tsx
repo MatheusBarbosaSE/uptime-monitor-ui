@@ -5,9 +5,10 @@ import CreateTarget from './CreateTarget';
 
 interface DashboardProps {
   token: string;
+  onViewHistory: (targetId: number) => void;
 }
 
-const Dashboard = ({ token }: DashboardProps) => {
+const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +35,6 @@ const Dashboard = ({ token }: DashboardProps) => {
     if (!window.confirm('Are you sure you want to delete this target?')) {
       return;
     }
-
     try {
       await deleteTargetApi(targetId, token);
       fetchTargets();
@@ -51,9 +51,7 @@ const Dashboard = ({ token }: DashboardProps) => {
   return (
     <div>
       <CreateTarget token={token} onTargetCreated={fetchTargets} />
-
       <hr />
-
       <h2>Your Targets</h2>
       {loading ? (
         <p>Loading targets...</p>
@@ -63,8 +61,14 @@ const Dashboard = ({ token }: DashboardProps) => {
         <ul>
           {targets.map((target) => (
             <li key={target.id}>
-              <strong>{target.name}</strong> ({target.url}) - Checks every {target.checkInterval} min
+              <strong>{target.name}</strong> ({target.url})
 
+              <button 
+                onClick={() => onViewHistory(target.id)}
+                style={{ marginLeft: '10px' }}
+              >
+                View History
+              </button>
               <button 
                 onClick={() => handleDelete(target.id)}
                 style={{ marginLeft: '10px' }}
