@@ -25,3 +25,11 @@ export const createTargetApi = (data: CreateTargetRequest, token: string) => {
     },
   });
 };
+
+export const deleteTargetApi = (targetId: number, token: string) => {
+  return apiClient.delete(`/api/targets/${targetId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

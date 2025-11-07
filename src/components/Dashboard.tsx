@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getTargetsApi } from '../services/apiService';
+import { getTargetsApi, deleteTargetApi } from '../services/apiService';
 import { type Target } from '../types/target.types';
 import CreateTarget from './CreateTarget';
 
@@ -30,6 +30,20 @@ const Dashboard = ({ token }: DashboardProps) => {
     fetchTargets();
   }, [fetchTargets]);
 
+  const handleDelete = async (targetId: number) => {
+    if (!window.confirm('Are you sure you want to delete this target?')) {
+      return;
+    }
+
+    try {
+      await deleteTargetApi(targetId, token);
+      fetchTargets();
+    } catch (err) {
+      console.error('Failed to delete target:', err);
+      setError('Failed to delete target.');
+    }
+  };
+
   if (error) {
     return <div style={{ color: 'red' }}>{error}</div>;
   }
@@ -37,6 +51,8 @@ const Dashboard = ({ token }: DashboardProps) => {
   return (
     <div>
       <CreateTarget token={token} onTargetCreated={fetchTargets} />
+
+      <hr />
 
       <h2>Your Targets</h2>
       {loading ? (
@@ -48,6 +64,13 @@ const Dashboard = ({ token }: DashboardProps) => {
           {targets.map((target) => (
             <li key={target.id}>
               <strong>{target.name}</strong> ({target.url}) - Checks every {target.checkInterval} min
+
+              <button 
+                onClick={() => handleDelete(target.id)}
+                style={{ marginLeft: '10px' }}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
