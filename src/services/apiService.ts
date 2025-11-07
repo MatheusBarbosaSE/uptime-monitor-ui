@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { type LoginRequest, type AuthenticationResponse } from '../types/auth.types';
 import { type CreateTargetRequest, type Target } from '../types/target.types';
+import { type HealthCheck, type ApiResponsePage } from '../types/history.types';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080',
@@ -32,4 +33,20 @@ export const deleteTargetApi = (targetId: number, token: string) => {
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const getHistoryApi = (targetId: number, token: string, page: number = 0) => {
+  return apiClient.get<ApiResponsePage<HealthCheck>>(
+    `/api/targets/${targetId}/health-checks`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page: page,
+        size: 10,
+        sort: 'checkedAt,desc',
+      },
+    }
+  );
 };
