@@ -14,10 +14,16 @@ const TargetHistory = ({ token, targetId, onBack }: TargetHistoryProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [tempStartDate, setTempStartDate] = useState('');
+  const [tempEndDate, setTempEndDate] = useState('');
+
+  const [appliedStartDate, setAppliedStartDate] = useState<string | undefined>(undefined);
+  const [appliedEndDate, setAppliedEndDate] = useState<string | undefined>(undefined);
+
   const fetchHistory = useCallback(async (page: number) => {
     setLoading(true);
     try {
-      const response = await getHistoryApi(targetId, token, page);
+      const response = await getHistoryApi(targetId, token, page, appliedStartDate, appliedEndDate);
       setHistoryPage(response.data);
       setError(null);
     } catch (err) {
@@ -26,7 +32,7 @@ const TargetHistory = ({ token, targetId, onBack }: TargetHistoryProps) => {
     } finally {
       setLoading(false);
     }
-  }, [targetId, token]);
+  }, [targetId, token, appliedStartDate, appliedEndDate]);
 
   useEffect(() => {
     fetchHistory(currentPage);
@@ -44,15 +50,22 @@ const TargetHistory = ({ token, targetId, onBack }: TargetHistoryProps) => {
     }
   };
 
+  const handleFilterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const startDateUTC = tempStartDate ? `${tempStartDate}T00:00:00Z` : undefined;
+    const endDateUTC = tempEndDate ? `${tempEndDate}T23:59:59Z` : undefined;
+
+    setAppliedStartDate(startDateUTC);
+    setAppliedEndDate(endDateUTC);
+    setCurrentPage(0);
+  };
+
   const renderContent = () => {
-    if (loading) {
-      return <p>Loading history...</p>;
-    }
-    if (error) {
-      return <p style={{ color: 'red' }}>{error}</p>;
-    }
+    if (loading) return <p>Loading history...</p>;
+    if (error) return <p style={{ color: 'red' }}>{error}</p>;
     if (!historyPage || historyPage.empty) {
-      return <p>No history found for this target yet.</p>;
+      return <p>No history found for this target (or selected date range).</p>;
     }
 
     return (
@@ -95,6 +108,27 @@ const TargetHistory = ({ token, targetId, onBack }: TargetHistoryProps) => {
     <div>
       <button onClick={onBack}>&larr; Back to Dashboard</button>
       <h2>History for Target ID: {targetId}</h2>
+
+      <form onSubmit={handleFilterSubmit} style={{ margin: '10px 0' }}>
+        <label htmlFor="startDate">From: </label>
+        <input 
+          type="date" 
+          id="startDate"
+          value={tempStartDate}
+          onChange={(e) => setTempStartDate(e.target.value)}
+        />
+        <label htmlFor="endDate" style={{ marginLeft: '10px' }}>To: </label>
+        <input 
+          type="date" 
+          id="endDate"
+          value={tempEndDate}
+          onChange={(e) => setTempEndDate(e.target.value)}
+        />
+        <button type="submit" style={{ marginLeft: '10px' }}>Filter</button>
+      </form>
+
+      <hr />
+
       {renderContent()}
     </div>
   );
