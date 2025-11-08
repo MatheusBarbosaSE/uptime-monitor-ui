@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getTargetsApi, deleteTargetApi } from '../services/apiService';
 import { type Target } from '../types/target.types';
 import CreateTarget from './CreateTarget';
+import EditTarget from './EditTarget';
 
 interface DashboardProps {
   token: string;
@@ -12,6 +13,8 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [editingTargetId, setEditingTargetId] = useState<number | null>(null);
 
   const fetchTargets = useCallback(async () => {
     setLoading(true);
@@ -44,6 +47,21 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
     }
   };
 
+  const handleUpdateComplete = () => {
+    setEditingTargetId(null);
+    fetchTargets();
+  };
+
+  if (editingTargetId) {
+    return (
+      <EditTarget
+        token={token}
+        targetId={editingTargetId}
+        onUpdateComplete={handleUpdateComplete}
+      />
+    );
+  }
+
   if (error) {
     return <div style={{ color: 'red' }}>{error}</div>;
   }
@@ -61,8 +79,14 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
         <ul>
           {targets.map((target) => (
             <li key={target.id}>
-              <strong>{target.name}</strong> ({target.url})
+              <strong>{target.name}</strong> ({target.url}) - Checks every {target.checkInterval} min
 
+              <button 
+                onClick={() => setEditingTargetId(target.id)}
+                style={{ marginLeft: '10px' }}
+              >
+                Edit
+              </button>
               <button 
                 onClick={() => onViewHistory(target.id)}
                 style={{ marginLeft: '10px' }}

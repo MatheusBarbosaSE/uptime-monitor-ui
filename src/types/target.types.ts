@@ -11,3 +11,9 @@ export interface CreateTargetRequest {
   url: string;
   checkInterval: number;
 }
+
+export interface UpdateTargetRequest {
+  name: string;
+  url: string;
+  checkInterval: number;
+}
