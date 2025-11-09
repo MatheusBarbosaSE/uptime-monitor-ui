@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { type CreateTargetRequest } from '../types/target.types';
 import { createTargetApi } from '../services/apiService';
 
+import { 
+  TextInput, 
+  NumberInput,
+  Button, 
+  Stack, 
+  Title, 
+  Alert, 
+  Group 
+} from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
+
 interface CreateTargetProps {
   token: string;
   onTargetCreated: () => void;
@@ -14,9 +25,9 @@ const CreateTarget = ({ token, onTargetCreated }: CreateTargetProps) => {
     checkInterval: 5,
   });
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (name: string, value: string | number) => {
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -26,15 +37,16 @@ const CreateTarget = ({ token, onTargetCreated }: CreateTargetProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     const dataToSubmit = {
       ...formData,
-      checkInterval: Number(formData.checkInterval),
+      checkInterval: Number(formData.checkInterval), 
     };
 
     try {
       await createTargetApi(dataToSubmit, token);
-      alert('Target created successfully!');
+
       setFormData({ name: '', url: '', checkInterval: 5 });
       onTargetCreated();
     } catch (err: any) {
@@ -45,51 +57,60 @@ const CreateTarget = ({ token, onTargetCreated }: CreateTargetProps) => {
       } else {
         setError('Failed to create target. Please check the details.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <h3>Create New Target</h3>
+      <Title order={3}>Create New Target</Title>
+
       <form onSubmit={handleSubmit}>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="url">URL:</label>
-          <input
-            type="text"
-            id="url"
-            name="url"
-            value={formData.url}
-            onChange={handleChange}
-            placeholder="http://example.com"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="checkInterval">Check Interval (minutes):</label>
-          <input
-            type="number"
-            id="checkInterval"
-            name="checkInterval"
-            value={formData.checkInterval}
-            onChange={handleChange}
-            min="1"
-            max="1440"
-            required
-          />
-        </div>
-        <button type="submit">Add Target</button>
+        <Stack gap="md" mt="sm">
+          {error && (
+            <Alert color="red" title="Error" icon={<IconAlertCircle />}>
+              {error}
+            </Alert>
+          )}
+
+          <Group grow>
+            <TextInput
+              label="Name"
+              name="name"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.currentTarget.value)}
+              placeholder="My personal blog"
+              required
+            />
+
+            <TextInput
+              label="URL"
+              name="url"
+              value={formData.url}
+              onChange={(e) => handleChange('url', e.currentTarget.value)}
+              placeholder="http://example.com"
+              required
+            />
+
+            <NumberInput
+              label="Interval (min)"
+              name="checkInterval"
+              value={formData.checkInterval}
+              onChange={(value) => handleChange('checkInterval', value)}
+              min={1}
+              max={1440}
+              required
+            />
+          </Group>
+
+          <Group justify="flex-end" mt="xs">
+            <Button type="submit" loading={loading}>
+              Add Target
+            </Button>
+          </Group>
+
+        </Stack>
       </form>
     </div>
   );
