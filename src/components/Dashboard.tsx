@@ -4,6 +4,19 @@ import { type Target } from '../types/target.types';
 import CreateTarget from './CreateTarget';
 import EditTarget from './EditTarget';
 
+import { 
+  Paper, 
+  Title, 
+  Text, 
+  Table, 
+  Button, 
+  Group, 
+  Loader, 
+  Alert,
+  Center
+} from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
+
 interface DashboardProps {
   token: string;
   onViewHistory: (targetId: number) => void;
@@ -13,7 +26,6 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [editingTargetId, setEditingTargetId] = useState<number | null>(null);
 
   const fetchTargets = useCallback(async () => {
@@ -63,47 +75,77 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
   }
 
   if (error) {
-    return <div style={{ color: 'red' }}>{error}</div>;
+    return (
+      <Alert color="red" title="Error" icon={<IconAlertCircle />}>
+        {error}
+      </Alert>
+    );
   }
 
-  return (
-    <div>
-      <CreateTarget token={token} onTargetCreated={fetchTargets} />
-      <hr />
-      <h2>Your Targets</h2>
-      {loading ? (
-        <p>Loading targets...</p>
-      ) : targets.length === 0 ? (
-        <p>You don't have any targets yet. Use the form above to add one!</p>
-      ) : (
-        <ul>
-          {targets.map((target) => (
-            <li key={target.id}>
-              <strong>{target.name}</strong> ({target.url}) - Checks every {target.checkInterval} min
+  const rows = targets.map((target) => (
+    <Table.Tr key={target.id}>
+      <Table.Td>
+        <Text fw={500}>{target.name}</Text>
+      </Table.Td>
+      <Table.Td>
+        <Text c="dimmed">{target.url}</Text>
+      </Table.Td>
+      <Table.Td>{target.checkInterval} min</Table.Td>
+      <Table.Td>
+        <Group gap="xs" justify="flex-end">
+          <Button 
+            variant="outline" 
+            size="xs" 
+            onClick={() => setEditingTargetId(target.id)}
+          >
+            Edit
+          </Button>
+          <Button 
+            variant="outline" 
+            size="xs" 
+            onClick={() => onViewHistory(target.id)}
+          >
+            History
+          </Button>
+          <Button 
+            variant="filled" 
+            color="red" 
+            size="xs" 
+            onClick={() => handleDelete(target.id)}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Table.Td>
+    </Table.Tr>
+  ));
 
-              <button 
-                onClick={() => setEditingTargetId(target.id)}
-                style={{ marginLeft: '10px' }}
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => onViewHistory(target.id)}
-                style={{ marginLeft: '10px' }}
-              >
-                View History
-              </button>
-              <button 
-                onClick={() => handleDelete(target.id)}
-                style={{ marginLeft: '10px' }}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
+  return (
+    <Paper withBorder shadow="md" p="lg" radius="md">
+      <CreateTarget token={token} onTargetCreated={fetchTargets} />
+
+      <hr style={{ margin: '20px 0' }} />
+
+      <Title order={2} mb="md">Your Targets</Title>
+
+      {loading ? (
+        <Center><Loader /></Center>
+      ) : targets.length === 0 ? (
+        <Text>You don't have any targets yet. Use the form above to add one!</Text>
+      ) : (
+        <Table striped highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>URL</Table.Th>
+              <Table.Th>Interval</Table.Th>
+              <Table.Th style={{ textAlign: 'right' }}>Actions</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{rows}</Table.Tbody>
+        </Table>
       )}
-    </div>
+    </Paper>
   );
 };
 
