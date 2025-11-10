@@ -6,3 +6,9 @@ export interface LoginRequest {
 export interface AuthenticationResponse {
   token: string;
 }
+
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  email: string;
+}

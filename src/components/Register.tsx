@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { type LoginRequest } from '../types/auth.types';
-import { loginApi } from '../services/apiService';
+import { type RegisterRequest } from '../types/auth.types';
+import { registerApi } from '../services/apiService';
 
 import { 
   TextInput, 
@@ -15,15 +15,16 @@ import {
 } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
 
-interface LoginProps {
-  onLoginSuccess: (token: string) => void;
-  onShowRegister: () => void;
+interface RegisterProps {
+  onRegisterSuccess: (token: string) => void;
+  onShowLogin: () => void;
 }
 
-const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
-  const [formData, setFormData] = useState<LoginRequest>({
+const Register = ({ onRegisterSuccess, onShowLogin }: RegisterProps) => {
+  const [formData, setFormData] = useState<RegisterRequest>({
     username: '',
     password: '',
+    email: ''
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,12 +41,18 @@ const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
     try {
-      const response = await loginApi(formData);
-      onLoginSuccess(response.data.token);
-    } catch (err) {
-      console.error('Login failed:', err);
-      setError('Login failed. Please check your username and password.');
+      const response = await registerApi(formData);
+      onRegisterSuccess(response.data.token);
+    } catch (err: any) {
+      console.error('Registration failed:', err);
+      if (err.response && err.response.data && err.response.data.errors) {
+        const validationErrors = err.response.data.errors.map((e: any) => e.message).join(', ');
+        setError(validationErrors);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
       setLoading(false);
     }
   };
@@ -53,15 +60,17 @@ const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
   return (
     <Container size="xs" style={{ width: '100%' }}>
       <Paper withBorder shadow="md" p="lg" radius="md"> 
-        <Title order={2} ta="center">Login</Title>
+        <Title order={2} ta="center">Create Account</Title>
 
         <form onSubmit={handleSubmit}>
           <Stack gap="md" mt="md"> 
+
             {error && (
               <Alert color="red" title="Error" icon={<IconAlertCircle />}>
                 {error}
               </Alert>
             )}
+
             <TextInput
               label="Username"
               name="username"
@@ -69,6 +78,17 @@ const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
               onChange={handleChange}
               required
             />
+
+            <TextInput
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your-email@example.com"
+              required
+            />
+
             <PasswordInput
               label="Password"
               name="password"
@@ -76,12 +96,13 @@ const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
               onChange={handleChange}
               required
             />
+
             <Button type="submit" loading={loading} fullWidth>
-              Login
+              Register
             </Button>
 
-            <Anchor component="button" type="button" c="dimmed" onClick={onShowRegister} size="sm" ta="center">
-              Don't have an account? Register
+            <Anchor component="button" type="button" c="dimmed" onClick={onShowLogin} size="sm" ta="center">
+              Already have an account? Login
             </Anchor>
 
           </Stack>
@@ -91,4 +112,4 @@ const Login = ({ onLoginSuccess, onShowRegister }: LoginProps) => {
   );
 };
 
-export default Login;
+export default Register;

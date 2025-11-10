@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { type LoginRequest, type AuthenticationResponse } from '../types/auth.types';
+import { type LoginRequest, type AuthenticationResponse, type RegisterRequest } from '../types/auth.types';
 import { 
   type Target, 
   type CreateTargetRequest, 
@@ -13,6 +13,10 @@ const apiClient = axios.create({
 
 export const loginApi = (data: LoginRequest) => {
   return apiClient.post<AuthenticationResponse>('/api/auth/login', data);
+};
+
+export const registerApi = (data: RegisterRequest) => {
+  return apiClient.post<AuthenticationResponse>('/api/auth/register', data);
 };
 
 export const getTargetsApi = (token: string) => {
