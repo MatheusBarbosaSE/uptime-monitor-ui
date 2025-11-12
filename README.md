@@ -1,73 +1,153 @@
-# React + TypeScript + Vite
+# 🖥️ Uptime Monitor (UI)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-18-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blueviolet)
+![Vite](https://img.shields.io/badge/Vite-5-yellow)
+![Mantine UI](https://img.shields.io/badge/UI-Mantine-blue)
 
-Currently, two official plugins are available:
+This is the official React + TypeScript frontend for the [Uptime Monitor API](https://github.com/MatheusBarbosaSE/uptime-monitor).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+It provides a complete, modern, and responsive user interface for users to log in, register, and manage their website monitoring targets. The interface is built using the **[Mantine](https://mantine.dev/)** component library for a professional look and feel, including a dark mode by default.
 
-## React Compiler
+---
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## 📸 Visual Demo
 
-## Expanding the ESLint configuration
+![Uptime Monitor Demo](demo/uptime-monitor.gif)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📑 Table of Contents
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [Description](#-uptime-monitor-ui)
+- [Visual Demo](#-visual-demo)
+- [Features](#-features)
+- [Installation & Usage](#-installation--usage)
+- [Project Structure](#-project-structure)
+- [Technologies Used](#-technologies-used)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## ✨ Features
+
+- ✅ **Full Authentication Flow:** Login and Registration pages with JWT handling.
+- ✅ **Full CRUD:** Create, Read, Update, and Delete targets directly from the UI.
+- ✅ **Account Management:** Users can update their profile (username, email) and change their password.
+- ✅ **History Reports:** A dedicated page to view target history with pagination and date filters.
+- ✅ **Modern UI/UX:** Built with Mantine for a professional, responsive design (dark mode default).
+- ✅ **Error Handling:** Provides clear feedback for API or validation errors.
+
+---
+
+## ⚙️ Installation & Usage
+
+### Requirements
+- [Node.js](https://nodejs.org/) (v20+)
+- [npm](https://www.npmjs.com/)
+- The **[Uptime Monitor Back-end API](https://github.com/MatheusBarbosaSE/uptime-monitor)** must be running on `http://localhost:8080`.
+
+### 1. Back-end Configuration (CORS)
+
+Before you can use this frontend, you must configure the **Back-end API** to accept requests from this app.
+
+In your Java project (`uptime-monitor`), open `src/main/java/.../config/SecurityConfig.java` and ensure the `corsConfigurationSource` Bean is allowing the correct origin:
+
+```java
+// In your Java SecurityConfig.java
+configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+// Note: 5173 is the default port for Vite. Change if yours is different.
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Frontend Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Clone this repository
+git clone [https://github.com/MatheusBarbosaSE/uptime-monitor-ui.git](https://github.com/MatheusBarbosaSE/uptime-monitor-ui.git)
+cd uptime-monitor-ui
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install all dependencies (React, Mantine, Axios, etc.)
+npm install
 ```
+
+### 3. Running the App
+
+```bash
+# Start the development server
+npm run dev
+```
+The app will open in your browser at `http://localhost:5173`.
+
+---
+
+## 📂 Project Structure
+
+```bash
+uptime-monitor-ui/
+│
+├── demo/                 # Media used in README
+├── public/               # Static assets
+├── src/
+│   ├── assets/           # Images, SVGs (currently empty)
+│   ├── components/       # Reusable React components
+│   │   ├── AccountPage.tsx   # User profile management page
+│   │   ├── App.tsx       # Main app layout and routing logic
+│   │   ├── CreateTarget.tsx  # Form for new targets
+│   │   ├── Dashboard.tsx   # Main dashboard (list targets)
+│   │   ├── EditTarget.tsx    # Form for updating targets
+│   │   ├── Login.tsx       # Login form
+│   │   ├── Register.tsx    # Registration form
+│   │   └── TargetHistory.tsx # History page component
+│   │
+│   ├── services/         # API logic
+│   │   └── apiService.ts   # Axios client (all API calls)
+│   │
+│   ├── types/            # TypeScript type definitions (DTOs)
+│   │   ├── auth.types.ts
+│   │   ├── history.types.ts
+│   │   ├── target.types.ts
+│   │   └── user.types.ts
+│   │
+│   ├── App.css           # (Empty)
+│   ├── index.css         # (Empty)
+│   └── main.tsx          # Main entry point (renders App)
+│
+├── .gitignore            # Ignore rules for Git
+├── index.html            # The single HTML page shell
+├── LICENSE               # MIT License
+├── package.json          # NPM dependencies (like pom.xml)
+├── package-lock.json     # NPM dependency lock file
+├── README.md             # Project documentation
+└── tsconfig.json         # TypeScript configuration
+```
+
+---
+
+## 🛠 Technologies Used
+
+- [React](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) (Build Tool)
+- [Mantine](https://mantine.dev/) (UI Component Library)
+- [Axios](https://axios-http.com/) (HTTP Client)
+- [Tabler Icons](https://tabler-icons.io/)
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'feat: add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+Feel free to open **issues** for bug reports or suggestions.
+
+---
+
+## 📄 License
+
+This project is licensed under the **[MIT License](LICENSE)**.  
+You are free to use, copy, modify, and distribute this software, provided you keep the original credits.
