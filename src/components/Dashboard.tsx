@@ -20,9 +20,10 @@ import { IconAlertCircle } from '@tabler/icons-react';
 interface DashboardProps {
   token: string;
   onViewHistory: (targetId: number) => void;
+  onViewAccount: () => void;
 }
 
-const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
+const Dashboard = ({ token, onViewHistory, onViewAccount }: DashboardProps) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +59,7 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
       setError('Failed to delete target.');
     }
   };
-
+ 
   const handleUpdateComplete = () => {
     setEditingTargetId(null);
     fetchTargets();
@@ -122,11 +123,19 @@ const Dashboard = ({ token, onViewHistory }: DashboardProps) => {
 
   return (
     <Paper withBorder shadow="md" p="lg" radius="md">
+      
+      <Group justify="space-between" mb="lg">
+        <Title order={2}>Dashboard</Title>
+        <Button variant="outline" onClick={onViewAccount}>
+          My Account
+        </Button>
+      </Group>
+
       <CreateTarget token={token} onTargetCreated={fetchTargets} />
 
       <hr style={{ margin: '20px 0' }} />
 
-      <Title order={2} mb="md">Your Targets</Title>
+      <Title order={3} mb="md">Your Targets</Title>
 
       {loading ? (
         <Center><Loader /></Center>
