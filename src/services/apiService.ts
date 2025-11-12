@@ -3,8 +3,13 @@ import { type LoginRequest, type AuthenticationResponse, type RegisterRequest } 
 import { 
   type Target, 
   type CreateTargetRequest, 
-  type UpdateTargetRequest 
+  type UpdateTargetRequest ,
 } from '../types/target.types';
+import { 
+  type UserDetailsResponse, 
+  type UpdateUserRequest, 
+  type ChangePasswordRequest 
+} from '../types/user.types';
 import { type HealthCheck, type ApiResponsePage } from '../types/history.types';
 
 const apiClient = axios.create({
@@ -69,4 +74,22 @@ export const getHistoryApi = (
       },
     }
   );
+};
+
+export const getUserDetailsApi = (token: string) => {
+  return apiClient.get<UserDetailsResponse>('/api/user/me', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const updateUserApi = (data: UpdateUserRequest, token: string) => {
+  return apiClient.put<UserDetailsResponse>('/api/user/profile', data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const changePasswordApi = (data: ChangePasswordRequest, token: string) => {
+  return apiClient.put('/api/user/password', data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };
